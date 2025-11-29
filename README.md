@@ -143,3 +143,64 @@ PC起動時に自動で `RecWatch` を立ち上げる設定です。
 
 3.  **古い通知の削除**:
     通知センターに古い通知が溜まっていると、新しい通知が表示されない（隠れている）場合があります。通知センターを開いて確認してみてください。
+
+
+## TODO
+
+- [ ] `rec-watch init` サブコマンドで初期セットアップ自動化
+  - [ ] `~/Desktop/ScreenRecordings` を自動作成
+  - [ ] `~/Library/LaunchAgents/com.user.recwatch.plist` を自動生成
+  - [ ] `launchctl load` まで案内 or 実行（対話プロンプト付き）
+
+- [ ] `--dry-run` オプション
+  - [ ] 実際には変換せず、実行予定の `ffmpeg` コマンドのみを標準出力に表示
+  - [ ] 終了コードやフィルタリング結果は実行時と同じになるように揃える
+
+- [ ] `--ignore-keywords` オプション
+  - [ ] ファイル名に含まれるキーワードを「除外」フィルタとして扱う
+  - [ ] `--keywords` と併用したときの優先順位を README に明記
+
+- [ ] エラーメッセージの改善
+  - [ ] `ffmpeg` が見つからない場合のガイド（`brew install ffmpeg` の提案）
+  - [ ] `terminal-notifier` がない／通知失敗時のガイド強化
+  - [ ] 変換失敗時に、入力ファイル名・ffmpeg の stderr の要約を出す
+
+- [ ] `--version` フラグの追加
+  - [ ] バージョン + ビルド情報（Go version, commit hash など）を表示
+
+- [ ] 設定ファイル対応
+  - [ ] `~/.config/rec-watch/config.yaml` などからデフォルト設定を読み込む
+  - [ ] デフォルトの `watch` パス / `dest` / `crf` / `preset` / `keywords` / `ignore-keywords` / `notify` など
+
+- [ ] ログ出力の整備
+  - [ ] 変換結果を JSON Lines 形式で `~/Library/Logs/rec-watch.log` に記録
+  - [ ] 入力パス / 出力パス / 所要時間 / サイズ削減量 / ステータス(success/fail) を保存
+
+- [ ] 簡易テストの追加
+  - [ ] ファイル名フィルタリング（`--keywords` / `--ignore-keywords`）のユニットテスト
+  - [ ] `--dry-run` 時にファイル操作が走らないことのテスト
+
+
+## Milestones
+
+### v0.3.x
+
+- [ ] `rec-watch init` の実装
+  - [ ] 初期セットアップ手順を README からほぼワンコマンドに集約
+- [ ] `--dry-run` / `--ignore-keywords` の実装
+- [ ] ffmpeg / terminal-notifier 未インストール時のエラーメッセージ改善
+- [ ] 簡易設定ファイル対応（デフォルト値を CLI フラグより前に読み込む）
+- [ ] 基本的なユニットテスト（フィルタ・オプション周り）を追加
+
+### v0.4.x
+
+- [ ] プロファイル機能
+  - 例: `--profile youtube`, `--profile archive` などで `crf` / `preset` を一括切り替え
+- [ ] 複数ディレクトリ監視対応
+  - 例: `--watch` を複数回指定、内部ではワーカーを増やして処理
+- [ ] `rec-watch stats` コマンド
+  - [ ] 変換件数 / 失敗件数 / 合計削減容量(前後サイズ差の合計) をログから集計して表示
+- [ ] ログフォーマット／ログローテーションの整備
+  - [ ] ログファイルサイズが一定以上でローテーション or 日付ごとのログに分割
+- [ ] 簡易 TUI モード（あれば楽しい枠）
+  - [ ] 現在処理中のファイルキューと進捗をターミナル内で一覧表示
