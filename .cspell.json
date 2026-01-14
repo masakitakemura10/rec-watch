@@ -1,0 +1,31 @@
+{
+    "version": "0.2",
+    "language": "en",
+    "words": [
+        "acodec",
+        "cobra",
+        "demuxer",
+        "doublestar",
+        "faststart",
+        "ffmpeg",
+        "ffprobe",
+        "fsnotify",
+        "gopkg",
+        "inconshreveable",
+        "launchctl",
+        "launchd",
+        "lumberjack",
+        "muxer",
+        "natefinch",
+        "osascript",
+        "pflag",
+        "plist",
+        "prioritise",
+        "recwatch",
+        "vcodec"
+    ],
+    "ignorePaths": [
+        "go.sum",
+        ".git"
+    ]
+}
