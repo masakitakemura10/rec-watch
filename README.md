@@ -57,8 +57,11 @@ sudo mv rec-watch /usr/local/bin/
 ### 監視モード (おすすめ)
 指定したディレクトリを常時監視し、新しいファイルが追加されると自動で変換します。
 ```bash
-rec-watch --watch ~/Desktop/ScreenRecordings
+mkdir -p ~/Desktop/ScreenRecordings-out ~/Desktop/ScreenRecordings
+./rec-watch --watch ~/Desktop/ScreenRecordings --notify --dest ~/Desktop/ScreenRecordings-out
 ```
+![DEMO](./docs/demo.gif)
+
 
 ### 一括変換モード
 カレントディレクトリ、または指定したディレクトリ以下の動画ファイルを一括変換します。
@@ -73,14 +76,26 @@ rec-watch ~/Movies/ScreenRecordings
 ### オプション一覧
 ```bash
 Flags:
-      --watch               指定したディレクトリを監視して自動変換する
-      --notify              変換完了時にデスクトップ通知を送る (default true)
-      --dest string         出力先ディレクトリ (default "./out")
-      --no-trash            変換元のファイルをゴミ箱に移動しない
-      --concurrent int      並列実行数 (default CPUコア数-1)
-      --crf int             CRF値 (品質) (default 22)
-      --preset string       エンコードプリセット (default "faster")
-      --keywords strings    ファイル名に含まれるキーワードでフィルタ
+      --batch-stamp               出力先ディレクトリをタイムスタンプ付きで作成する (default true)
+      --concurrent int            並列実行数 (default CPUコア数-1)
+      --crf int                   CRF値 (品質) (default 22)
+      --dest string               出力先ディレクトリ (default "./out")
+      --dry-run                   実行せずにコマンドを表示する
+      --ffmpeg-bin string         ffmpegのバイナリパスを明示的に指定する
+      --fps int                   フレームレート (0で無効)
+      --gpu                       GPU(VideoToolbox)を使用して変換する（超爆速・画質/圧縮率はCPUに劣る）
+  -h, --help                      help for rec-watch
+      --ignore-keywords strings   ファイル名に含まれるキーワード 除外
+      --keywords strings          ファイル名に含まれるキーワードでフィルタ
+      --mute                      音声をミュートする
+      --no-pad                    1080pにリサイズする際に黒帯を追加しない
+      --no-trash                  変換元のファイルをゴミ箱に移動しない
+      --notify                    変換完了時にデスクトップ通知を送る (default true)
+      --parallel-split            動画を分割して並列変換する（大容量ファイル向け・爆速）
+      --preset string             エンコードプリセット (default "faster")
+      --profile string            使用するプロファイル名
+      --stamp-per-file            個別のファイル名にタイムスタンプを追加する
+      --watch                     指定したディレクトリを監視して自動変換する
 ```
 
 ---
@@ -145,67 +160,13 @@ PC起動時に自動で `RecWatch` を立ち上げる設定です。
     通知センターに古い通知が溜まっていると、新しい通知が表示されない（隠れている）場合があります。通知センターを開いて確認してみてください。
 
 
+## 📖 詳細マニュアル
+TUIモードの操作方法や、GPU/並列変換モードの詳しい仕様については、以下のドキュメントを参照してください。
+
+👉 [詳細マニュアル (docs/USAGE.md)](./docs/USAGE.md)
+
 ## 関連、親和性があるリポジトリ
  [readme-gif-crafter](https://github.com/mt4110#:~:text=1-,readme%2Dgif%2Dcrafter,-Public)
 
-## TODO
-
-- [ ] `rec-watch init` サブコマンドで初期セットアップ自動化
-  - [ ] `~/Desktop/ScreenRecordings` を自動作成
-  - [ ] `~/Library/LaunchAgents/com.user.recwatch.plist` を自動生成
-  - [ ] `launchctl load` まで案内 or 実行（対話プロンプト付き）
-
-- [ ] `--dry-run` オプション
-  - [ ] 実際には変換せず、実行予定の `ffmpeg` コマンドのみを標準出力に表示
-  - [ ] 終了コードやフィルタリング結果は実行時と同じになるように揃える
-
-- [ ] `--ignore-keywords` オプション
-  - [ ] ファイル名に含まれるキーワードを「除外」フィルタとして扱う
-  - [ ] `--keywords` と併用したときの優先順位を README に明記
-
-- [ ] エラーメッセージの改善
-  - [ ] `ffmpeg` が見つからない場合のガイド（`brew install ffmpeg` の提案）
-  - [ ] `terminal-notifier` がない／通知失敗時のガイド強化
-  - [ ] 変換失敗時に、入力ファイル名・ffmpeg の stderr の要約を出す
-
-- [ ] `--version` フラグの追加
-  - [ ] バージョン + ビルド情報（Go version, commit hash など）を表示
-
-- [ ] 設定ファイル対応
-  - [ ] `~/.config/rec-watch/config.yaml` などからデフォルト設定を読み込む
-  - [ ] デフォルトの `watch` パス / `dest` / `crf` / `preset` / `keywords` / `ignore-keywords` / `notify` など
-
-- [ ] ログ出力の整備
-  - [ ] 変換結果を JSON Lines 形式で `~/Library/Logs/rec-watch.log` に記録
-  - [ ] 入力パス / 出力パス / 所要時間 / サイズ削減量 / ステータス(success/fail) を保存
-
-- [ ] 簡易テストの追加
-  - [ ] ファイル名フィルタリング（`--keywords` / `--ignore-keywords`）のユニットテスト
-  - [ ] `--dry-run` 時にファイル操作が走らないことのテスト
-
-
-## Milestones
-
-### v0.3.x
-
-- [ ] `rec-watch init` の実装
-  - [ ] 初期セットアップ手順を README からほぼワンコマンドに集約
-- [ ] `--dry-run` / `--ignore-keywords` の実装
-- [ ] ffmpeg / terminal-notifier 未インストール時のエラーメッセージ改善
-- [ ] 簡易設定ファイル対応（デフォルト値を CLI フラグより前に読み込む）
-- [ ] 基本的なユニットテスト（フィルタ・オプション周り）を追加
-
-### v0.4.x
-
-- [ ] プロファイル機能
-  - 例: `--profile youtube`, `--profile archive` などで `crf` / `preset` を一括切り替え
-- [ ] 複数ディレクトリ監視対応
-  - 例: `--watch` を複数回指定、内部ではワーカーを増やして処理
-- [ ] `rec-watch stats` コマンド
-  - [ ] 変換件数 / 失敗件数 / 合計削減容量(前後サイズ差の合計) をログから集計して表示
-- [ ] ログフォーマット／ログローテーションの整備
-  - [ ] ログファイルサイズが一定以上でローテーション or 日付ごとのログに分割
-- [ ] 簡易 TUI モード（あれば楽しい枠）
-  - [ ] 現在処理中のファイルキューと進捗をターミナル内で一覧表示
 
 
